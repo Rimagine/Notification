@@ -1,13 +1,12 @@
 <?php
-class sql extends dbconn {
-	public function __construct()
-	{
+class sql extends dbconn {	//don't forget it is extended
+	public function __construct(){
 		$this->initDBO();
 	}
 	public function saveNotif($msg,$time,$loop,$loop_every,$user){
 		$db = $this->dblocal;
-		try
-		{
+		try{
+			//here, a prepared statement is used with type NAMED-PLACEHOLDERS
 			$stmt = $db->prepare("insert into notif(notif_msg, notif_time, notif_repeat, notif_loop,username) values(:msg , :bctime , :repeat , :loop,:user) ");
 
 			$stmt->bindParam("msg", $msg);
@@ -17,7 +16,7 @@ class sql extends dbconn {
 			$stmt->bindParam("user", $user);
 			$stmt->execute();
 			$stat[0] = true;
-			$stat[1] = 'sukses';
+			$stat[1] = 'success';
 			return $stat;
 		}
 		catch(PDOException $ex)
@@ -27,17 +26,17 @@ class sql extends dbconn {
 			return $stat;
 		}
 	}
-	public function updateNotif($id,$nextime)
+	public function updateNotif($id,$nextime) 	//used to update notification table when noticed the user once
 	{
 		$db = $this->dblocal;
 		try
 		{
-			$stmt = $db->prepare("update notif set notif_time = :nextime, publish_date=CURRENT_TIMESTAMP(), notif_loop = notif_loop-1 where id=:id ");
+			$stmt = $db->prepare("update notif set notif_time = :nextime, publish_date=CURRENT_TIMESTAMP(),  notif_loop = notif_loop-1 where id=:id ");
 			$stmt->bindParam("id", $id);
 			$stmt->bindParam("nextime", $nextime);
 			$stmt->execute();
 			$stat[0] = true;
-			$stat[1] = 'sukses';
+			$stat[1] = 'Success';	//this is an array which saves if updated correctly
 			return $stat;
 		}
 		catch(PDOException $ex)
@@ -48,10 +47,10 @@ class sql extends dbconn {
 		}
 	}
 	
-	public function listNotifUser($user){
+	public function listNotifUser($user){	//selects only user unseen msgs
 		$db = $this->dblocal;
 		try
-		{
+		{	//among many types, FETCH_ASSOC is used 
 			$stmt = $db->prepare("SELECT * FROM notif
 				WHERE username= :user
 				AND notif_loop > 0
@@ -109,7 +108,7 @@ class sql extends dbconn {
 			return $stat;
 		}
 	}
-	public function listNotif(){
+	public function listNotif(){	//used to gather all the notifications
 		$db = $this->dblocal;
 		try
 		{
